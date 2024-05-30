@@ -10,12 +10,15 @@ def dlt(v, v1):
     return np.linalg.norm(np.array(v) - np.array(v1), ord=2) / (pow(2, 3) - 1)
 
 
-def answer(t, T, h, v, kounter, eps):
+def method(t, T, h, v, kounter, eps):
+    x = []
+    y = []
     kounter[0] = 0
     v2 = v
     while t < T + h / 2:
         v_0 = v
-        print("{:13.6f}".format(t), "{:12.6f}".format(h), "{:15.5e}".format(dlt(v, v2)), "{:12d}".format(kounter[0]), end=' ')
+        print("{:13.6f}".format(t), "{:12.6f}".format(h), "{:15.5e}".format(dlt(v, v2)), "{:12d}".format(kounter[0]),
+              end=' ')
         for vi in v_0:
             print("{:12.6f}".format(vi), end=' ')
         print()
@@ -27,38 +30,10 @@ def answer(t, T, h, v, kounter, eps):
             v = next(h, t, v_0, kounter)
             v1 = next(h / 2, t, v_0, kounter)
             v2 = next(h / 2, t + h / 2, v1, kounter)
-        while dlt(v, v2) < eps / 64:
-            h *= 2
-            v = next(h, t, v_0, kounter)
-            v1 = next(h / 2, t, v_0, kounter)
-            v2 = next(h / 2, t + h / 2, v1, kounter)
-        t += h
-    print()
-
-
-def stepdif(t, T, h, v, kounter, eps):
-    v1 = v
-    v2 = v
-    x = []
-    y = []
-    while t < T + h / 2:
-        v_0 = v
-        v = next(h, t, v_0, kounter)
-        v1 = next(h / 2, t, v_0, kounter)
-        v2 = next(h / 2, t + h / 2, v1, kounter)
-        while dlt(v, v2) > eps:
-            h /= 2
-            v = next(h, t, v_0, kounter)
-            v1 = next(h / 2, t, v_0, kounter)
-            v2 = next(h / 2, t + h / 2, v1, kounter)
-        while dlt(v, v2) < eps / 64:
-            h *= 2
-            v = next(h, t, v_0, kounter)
-            v1 = next(h / 2, t, v_0, kounter)
-            v2 = next(h / 2, t + h / 2, v1, kounter)
         t += h
         x.append(t)
         y.append(h)
+    print()
     x.pop()
     y.pop()
     return x, y, min(y), len(x)
@@ -71,14 +46,20 @@ def graphs(t, T, h, v, kounter):
     numstepses = []
     fig, ax = plt.subplots(2, 3)
     fig.tight_layout()
+    fig1, ax1 = plt.subplots(2, 3)
+    fig1.tight_layout()
     for item in epses:
         ax[k // 3, k % 3].set_title('eps = ' + str(item))
         ax[k // 3, k % 3].set_xlabel('Отрезок')
         ax[k // 3, k % 3].set_ylabel('Шаг')
-        x, y, minh, numsteps = stepdif(t, T, h, v, kounter, item)
+        ax1[k // 3, k % 3].set_title('eps = ' + str(item))
+        ax1[k // 3, k % 3].set_xlabel('Отрезок')
+        ax1[k // 3, k % 3].set_ylabel('Решение')
+        x, y, minh, numsteps = method(t, T, h, v, kounter, item)
         minhes.append(minh)
         numstepses.append(numsteps)
         ax[k // 3, k % 3].scatter(x, y)
+        ax1[k // 3, k % 3].plot(x, y)
         k += 1
     plt.figure()
     plt.semilogx(epses, minhes)
@@ -115,8 +96,4 @@ if __name__ == '__main__':
     kounter = [0]
     exec(b)
     graphs(t, T, h, v, kounter)
-    epses = [0.001, 0.0001, 0.00001, 0.000001, 0.0000001, 0.00000001]
-    for item in epses:
-        print('eps = ', item)
-        answer(t, T, h, v, kounter, item)
 
