@@ -13,10 +13,16 @@ def dlt(v, v1):
 def method(t, T, h, v, kounter, eps):
     x = []
     y = []
+    y1 = []
+    y2 = []
+    y3 = []
     kounter[0] = 0
     v2 = v
     while t < T + h / 2:
         v_0 = v
+        y1.append(v_0[0])
+        y2.append(v_0[1])
+        y3.append(v_0[2])
         print("{:13.6f}".format(t), "{:12.6f}".format(h), "{:15.5e}".format(dlt(v, v2)), "{:12d}".format(kounter[0]),
               end=' ')
         for vi in v_0:
@@ -36,7 +42,10 @@ def method(t, T, h, v, kounter, eps):
     print()
     x.pop()
     y.pop()
-    return x, y, min(y), len(x)
+    y1.pop()
+    y2.pop()
+    y3.pop()
+    return x, y, min(y), len(x), y1, y2, y3
 
 
 def graphs(t, T, h, v, kounter):
@@ -55,11 +64,14 @@ def graphs(t, T, h, v, kounter):
         ax1[k // 3, k % 3].set_title('eps = ' + str(item))
         ax1[k // 3, k % 3].set_xlabel('Отрезок')
         ax1[k // 3, k % 3].set_ylabel('Решение')
-        x, y, minh, numsteps = method(t, T, h, v, kounter, item)
+        print('eps = ', item)
+        x, y, minh, numsteps, y1, y2, y3 = method(t, T, h, v, kounter, item)
         minhes.append(minh)
         numstepses.append(numsteps)
         ax[k // 3, k % 3].scatter(x, y)
-        ax1[k // 3, k % 3].plot(x, y)
+        ax1[k // 3, k % 3].plot(x, y1)
+        ax1[k // 3, k % 3].plot(x, y2)
+        ax1[k // 3, k % 3].plot(x, y3)
         k += 1
     plt.figure()
     plt.semilogx(epses, minhes)
