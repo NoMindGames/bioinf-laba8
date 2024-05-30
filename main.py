@@ -33,7 +33,7 @@ def method(t, T, h, v, kounter, eps):
         v2 = next(h / 2, t + h / 2, v1, kounter)
         while dlt(v, v2) > eps:
             h /= 2
-            v = next(h, t, v_0, kounter)
+            v = v1
             v1 = next(h / 2, t, v_0, kounter)
             v2 = next(h / 2, t + h / 2, v1, kounter)
         t += h
